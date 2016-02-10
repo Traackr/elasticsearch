@@ -27,6 +27,7 @@ import org.apache.lucene.search.join.BitSetProducer;
 import org.apache.lucene.search.join.JoinUtil;
 import org.apache.lucene.search.join.ScoreMode;
 import org.apache.lucene.util.SuppressForbidden;
+import org.apache.lucene.search.similarities.Similarity;
 import org.elasticsearch.Version;
 import org.elasticsearch.common.ParseField;
 import org.elasticsearch.common.Strings;
@@ -44,7 +45,6 @@ import org.elasticsearch.index.search.child.ChildrenQuery;
 import org.elasticsearch.index.search.child.ScoreType;
 import org.elasticsearch.search.fetch.innerhits.InnerHitsContext;
 import org.elasticsearch.search.fetch.innerhits.InnerHitsSubSearchContext;
-import org.elasticsearch.search.internal.SearchContext;
 
 import java.io.IOException;
 
@@ -177,7 +177,8 @@ public class HasChildQueryParser implements QueryParser {
         final Query query;
         final ParentChildIndexFieldData parentChildIndexFieldData = parseContext.getForField(parentFieldMapper.fieldType());
         if (parseContext.indexVersionCreated().onOrAfter(Version.V_2_0_0_beta1)) {
-            query = joinUtilHelper(parentType, parentChildIndexFieldData, parentDocMapper.typeFilter(), scoreType, innerQuery, minChildren, maxChildren);
+            query = joinUtilHelper( parentType, parentChildIndexFieldData, parentDocMapper.typeFilter(), scoreType,
+                                    innerQuery, minChildren, maxChildren, parseContext.searchSimilarity());
         } else {
             // TODO: use the query API
             Filter parentFilter = new QueryWrapperFilter(parentDocMapper.typeFilter());
@@ -196,7 +197,9 @@ public class HasChildQueryParser implements QueryParser {
         return query;
     }
 
-    public static Query joinUtilHelper(String parentType, ParentChildIndexFieldData parentChildIndexFieldData, Query toQuery, ScoreType scoreType, Query innerQuery, int minChildren, int maxChildren) throws IOException {
+    public static Query joinUtilHelper(String parentType, ParentChildIndexFieldData parentChildIndexFieldData,
+                                       Query toQuery, ScoreType scoreType, Query innerQuery, int minChildren,
+                                       int maxChildren, Similarity similarity) throws IOException {
         ScoreMode scoreMode;
         // TODO: move entirely over from ScoreType to org.apache.lucene.join.ScoreMode, when we drop the 1.x parent child code.
         switch (scoreType) {
@@ -222,7 +225,8 @@ public class HasChildQueryParser implements QueryParser {
         if (maxChildren == 0) {
             maxChildren = Integer.MAX_VALUE;
         }
-        return new LateParsingQuery(toQuery, innerQuery, minChildren, maxChildren, parentType, scoreMode, parentChildIndexFieldData);
+        return new LateParsingQuery(toQuery, innerQuery, minChildren, maxChildren, parentType, scoreMode,
+                                    parentChildIndexFieldData, similarity);
     }
 
     final static class LateParsingQuery extends Query {
@@ -234,9 +238,12 @@ public class HasChildQueryParser implements QueryParser {
         private final String parentType;
         private final ScoreMode scoreMode;
         private final ParentChildIndexFieldData parentChildIndexFieldData;
+        private final Similarity similarity;
         private final Object identity = new Object();
 
-        LateParsingQuery(Query toQuery, Query innerQuery, int minChildren, int maxChildren, String parentType, ScoreMode scoreMode, ParentChildIndexFieldData parentChildIndexFieldData) {
+        LateParsingQuery(Query toQuery, Query innerQuery, int minChildren, int maxChildren,
+                         String parentType, ScoreMode scoreMode, ParentChildIndexFieldData parentChildIndexFieldData,
+                         Similarity similarity) {
             this.toQuery = toQuery;
             this.innerQuery = innerQuery;
             this.minChildren = minChildren;
@@ -244,6 +251,7 @@ public class HasChildQueryParser implements QueryParser {
             this.parentType = parentType;
             this.scoreMode = scoreMode;
             this.parentChildIndexFieldData = parentChildIndexFieldData;
+            this.similarity = similarity;
         }
 
         @Override
@@ -255,7 +263,8 @@ public class HasChildQueryParser implements QueryParser {
                 String joinField = ParentFieldMapper.joinField(parentType);
                 IndexSearcher indexSearcher = new IndexSearcher(reader);
                 indexSearcher.setQueryCache(null);
-                IndexParentChildFieldData indexParentChildFieldData = parentChildIndexFieldData.loadGlobal((DirectoryReader) reader);
+                indexSearcher.setSimilarity(similarity);
+                IndexParentChildFieldData indexParentChildFieldData = parentChildIndexFieldData.loadGlobal((DirectoryReader)reader);
                 MultiDocValues.OrdinalMap ordinalMap = ParentChildIndexFieldData.getOrdinalMap(indexParentChildFieldData, parentType);
                 return JoinUtil.createJoinQuery(joinField, innerQuery, toQuery, indexSearcher, scoreMode, ordinalMap, minChildren, maxChildren);
             } else {
