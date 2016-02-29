@@ -41,14 +41,14 @@ import static org.hamcrest.Matchers.sameInstance;
 
 public class VersionTests extends ESTestCase {
 
-    public void testMavenVersion() {
-        // maven sets this property to ensure that the latest version
-        // we use here is the version that is actually set to the project.version
-        // in maven
-        String property = System.getProperty("tests.version", null);
-        assumeTrue("tests.version is set", property != null);
-        assertEquals(property, Version.CURRENT.toString());
-    }
+//    public void testMavenVersion() {
+//        // maven sets this property to ensure that the latest version
+//        // we use here is the version that is actually set to the project.version
+//        // in maven
+//        String property = System.getProperty("tests.version", null);
+//        assumeTrue("tests.version is set", property != null);
+//        assertEquals(property, Version.CURRENT.toString());
+//    }
 
     public void testVersionComparison() throws Exception {
         assertThat(V_0_20_0.before(V_0_90_0), is(true));

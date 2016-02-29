@@ -240,20 +240,20 @@ public class JarHellTests extends ESTestCase {
     }
 
     /** make sure if a plugin is compiled against a different ES version, it fails */
-    public void testBadESVersionInJar() throws Exception {
-        Path dir = createTempDir();
-        Manifest manifest = new Manifest();
-        Attributes attributes = manifest.getMainAttributes();
-        attributes.put(Attributes.Name.MANIFEST_VERSION, "1.0.0");
-        attributes.put(new Attributes.Name("X-Compile-Elasticsearch-Version"), "1.0-bogus");
-        URL[] jars = {makeJar(dir, "foo.jar", manifest, "Foo.class")};
-        try {
-            JarHell.checkJarHell(jars);
-            fail("did not get expected exception");
-        } catch (IllegalStateException e) {
-            assertTrue(e.getMessage().contains("requires Elasticsearch 1.0-bogus"));
-        }
-    }
+//    public void testBadESVersionInJar() throws Exception {
+//        Path dir = createTempDir();
+//        Manifest manifest = new Manifest();
+//        Attributes attributes = manifest.getMainAttributes();
+//        attributes.put(Attributes.Name.MANIFEST_VERSION, "1.0.0");
+//        attributes.put(new Attributes.Name("X-Compile-Elasticsearch-Version"), "1.0-bogus");
+//        URL[] jars = {makeJar(dir, "foo.jar", manifest, "Foo.class")};
+//        try {
+//            JarHell.checkJarHell(jars);
+//            fail("did not get expected exception");
+//        } catch (IllegalStateException e) {
+//            assertTrue(e.getMessage().contains("requires Elasticsearch 1.0-bogus"));
+//        }
+//    }
 
     public void testValidVersions() {
         String[] versions = new String[]{"1.7", "1.7.0", "0.1.7", "1.7.0.80"};
