@@ -23,11 +23,11 @@
     </properties>
 
     <modules>
-        <module>shared</module>
-        <module>two-versions-parent</module>
-        <module>current</module>
-        <module>2.0</module>
-        <module>2.1</module>
+        <!--<module>shared</module>-->
+        <!--<module>two-versions-parent</module>-->
+        <!--<module>current</module>-->
+        <!--<module>2.0</module>-->
+        <!--<module>2.1</module>-->
     </modules>
 
     <build>
