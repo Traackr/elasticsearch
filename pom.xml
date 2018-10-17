@@ -6,7 +6,7 @@
 
     <groupId>org.elasticsearch</groupId>
     <artifactId>parent</artifactId>
-    <version>2.4.6-SNAPSHOT</version>
+    <version>2.4.6-traackr</version>
     <packaging>pom</packaging>
     <name>Elasticsearch: Parent POM</name>
     <description>Parent POM</description>
@@ -17,6 +17,15 @@
         <artifactId>oss-parent</artifactId>
         <version>7</version>
     </parent>
+
+    <distributionManagement>
+        <repository>
+          <uniqueVersion>false</uniqueVersion>
+          <id>nexus-private</id>
+          <url>http://repository.traackr.com/nexus/content/repositories/traackr-private/</url>
+          <layout>default</layout>
+        </repository>
+    </distributionManagement>
 
     <licenses>
         <license>
@@ -43,7 +52,7 @@
     <properties>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <!-- elasticsearch stack -->
-        <elasticsearch.version>${project.version}</elasticsearch.version>
+        <elasticsearch.version>2.4.6</elasticsearch.version>
         <jvm.executable>${java.home}${file.separator}bin${file.separator}java</jvm.executable>
         <maven.compiler.source>1.7</maven.compiler.source>
         <maven.compiler.target>1.7</maven.compiler.target>

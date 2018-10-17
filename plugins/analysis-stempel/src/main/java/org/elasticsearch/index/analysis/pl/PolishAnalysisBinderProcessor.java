@@ -20,6 +20,7 @@
 package org.elasticsearch.index.analysis.pl;
 
 import org.elasticsearch.index.analysis.AnalysisModule;
+import org.elasticsearch.index.analysis.StopTokenFilterFactory;
 
 /**
  */
@@ -32,5 +33,6 @@ public class PolishAnalysisBinderProcessor extends AnalysisModule.AnalysisBinder
     @Override
     public void processTokenFilters(TokenFiltersBindings tokenFiltersBindings) {
         tokenFiltersBindings.processTokenFilter("polish_stem", PolishStemTokenFilterFactory.class);
+        tokenFiltersBindings.processTokenFilter("polish_stop", StopTokenFilterFactory.class);
    }
 }

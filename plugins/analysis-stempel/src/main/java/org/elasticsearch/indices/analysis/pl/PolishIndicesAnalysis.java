@@ -20,6 +20,7 @@
 package org.elasticsearch.indices.analysis.pl;
 
 import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.core.StopFilter;
 import org.apache.lucene.analysis.pl.PolishAnalyzer;
 import org.apache.lucene.analysis.stempel.StempelFilter;
 import org.apache.lucene.analysis.stempel.StempelStemmer;
@@ -59,6 +60,16 @@ public class PolishIndicesAnalysis extends AbstractComponent {
                     throw new RuntimeException("Unable to load default stemming tables", ex);
                 }
                 return new StempelFilter(tokenStream, new StempelStemmer(tire));
+            }
+        }));
+
+        indicesAnalysisService.tokenFilterFactories().put("polish_stop", new PreBuiltTokenFilterFactoryFactory(new TokenFilterFactory() {
+            public String name() {
+                return "polish_stop";
+            }
+
+            public TokenStream create(TokenStream tokenStream) {
+                return new StopFilter(tokenStream, PolishAnalyzer.getDefaultStopSet());
             }
         }));
     }
