@@ -20,11 +20,15 @@
 
     <distributionManagement>
         <repository>
-          <uniqueVersion>false</uniqueVersion>
-          <id>nexus-private</id>
-          <url>http://repository.traackr.com/nexus/content/repositories/traackr-private/</url>
-          <layout>default</layout>
+            <id>central</id>
+            <name>traackr-maven-private-releases</name>
+            <url>https://artifactory.traackr.com/artifactory/traackr-maven-private-releases</url>
         </repository>
+        <snapshotRepository>
+            <id>snapshots</id>
+            <name>traackr-maven-private-snapshots</name>
+            <url>https://artifactory.traackr.com/artifactory/traackr-maven-private-snapshots</url>
+        </snapshotRepository>
     </distributionManagement>
 
     <licenses>
